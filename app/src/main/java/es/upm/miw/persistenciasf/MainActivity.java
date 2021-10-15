@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -13,11 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -88,7 +92,23 @@ public class MainActivity extends AppCompatActivity {
         FileOutputStream fos;
 
         try {  // Añadir al fichero
-            fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
+            if (utilizarMemInterna()) {
+                fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
+            } else {    // Comprobar estado SD card
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    fos = new FileOutputStream(rutaFich, true);
+                } else {
+                    Toast.makeText(
+                            this,
+                            getString(R.string.txtErrorMemExterna),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+            }
+
             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss: ").format(new Date());
             fos.write(date.getBytes());
             fos.write(etLineaTexto.getText().toString().getBytes());
@@ -114,8 +134,22 @@ public class MainActivity extends AppCompatActivity {
         tvContenidoFichero.setText("");
 
         try {
-            fin = new BufferedReader(
-                    new InputStreamReader(openFileInput(obtenerNombreFichero()))); // Memoria interna
+            if (utilizarMemInterna()) {
+                fin = new BufferedReader(
+                        new InputStreamReader(openFileInput(obtenerNombreFichero()))); // Memoria interna
+            } else {
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) { /* SD card */
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    Log.i(LOG_TAG, "rutaSD=" + rutaFich);
+                    fin = new BufferedReader(new FileReader(new File(rutaFich)));
+                } else {
+                    Log.i(LOG_TAG, "Estado SDcard=" + estadoTarjetaSD);
+                    Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
             String linea = fin.readLine();
             while (linea != null) {
                 hayContenido = true;
@@ -143,7 +177,18 @@ public class MainActivity extends AppCompatActivity {
     protected void borrarContenido() {
         try {  // Vaciar el fichero
             FileOutputStream fos;
-            fos = openFileOutput(obtenerNombreFichero(), Context.MODE_PRIVATE); // Memoria interna
+            if (utilizarMemInterna()) {
+                fos = openFileOutput(obtenerNombreFichero(), Context.MODE_PRIVATE); // Memoria interna
+            } else {    // Comprobar estado SD card
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    fos = new FileOutputStream(rutaFich);
+                } else {
+                    Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
             fos.close();
             Log.i(LOG_TAG, "opción Limpiar -> VACIAR el fichero");
             etLineaTexto.setText(""); // limpio la linea de edición

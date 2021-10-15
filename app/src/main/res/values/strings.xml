@@ -35,5 +35,8 @@
                     Si se activa esta opción se almacenará la información
                     en la tarjeta SD (si está disponible)
         </string>
+        <string name="txtErrorMemExterna">
+            ERROR: No es posible acceder a la memoria externa
+        </string>
 
 </resources>
