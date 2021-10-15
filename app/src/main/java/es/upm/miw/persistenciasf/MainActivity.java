@@ -1,7 +1,5 @@
 package es.upm.miw.persistenciasf;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +10,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +18,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -29,6 +30,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,6 +67,19 @@ public class MainActivity extends AppCompatActivity {
         });
         etLineaTexto.setFilters(new InputFilter[]{new InputFilter.LengthFilter(LONGITUD_MENSAJE)});
 
+        // Provoca el envío al pulsar la tecla <Enter>
+        etLineaTexto.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Se ha pulsado una tecla y es <Enter>
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    btBotonEnviar.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -96,13 +111,13 @@ public class MainActivity extends AppCompatActivity {
      * @return valor lógico
      */
     private boolean utilizarMemInterna() {
-        boolean utilizarMemoria = !preferencias.getBoolean(
+        boolean utilizarMemInterna = !preferencias.getBoolean(
                 getString(R.string.key_TarjetaSD),
                 getResources().getBoolean(R.bool.default_prefTarjetaSD)
         );
-        Log.i(LOG_TAG, "Memoria SD: " + ((utilizarMemoria) ? "on" : "off"));
+        Log.i(LOG_TAG, "Memoria SD: " + ((!utilizarMemInterna) ? "on" : "off"));
 
-        return utilizarMemoria;
+        return utilizarMemInterna;
     }
 
     /**
@@ -132,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss: ").format(new Date());
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss: ", Locale.getDefault())
+                    .format(new Date());
             fos.write(date.getBytes());
             fos.write(etLineaTexto.getText().toString().getBytes());
             fos.write('\n');

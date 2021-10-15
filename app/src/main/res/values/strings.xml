@@ -19,7 +19,6 @@
 
     <!-- Preferencias -->
         <!-- Título categoría -->
-        <string name="key_Categoría">opc_Fichero</string>
         <string name="title_Categoría">OPCIONES DE ALMACENAMIENTO</string>
 
 
