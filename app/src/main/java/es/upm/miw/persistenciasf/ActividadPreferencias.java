@@ -1,15 +1,25 @@
 package es.upm.miw.persistenciasf;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceFragmentCompat;
 
-public class ActividadPreferencias extends PreferenceActivity {
+public class ActividadPreferencias extends AppCompatActivity {
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.preferencias);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, new ActividadPreferenciasFragment())
+                .commit();
+    }
+
+    public static class ActividadPreferenciasFragment extends PreferenceFragmentCompat {
+        @Override
+        public void onCreatePreferences(final Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferencias, rootKey);
+        }
     }
 }
