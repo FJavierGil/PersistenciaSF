@@ -3,7 +3,10 @@ package es.upm.miw.persistenciasf;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +19,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText etLineaTexto;
     private TextView tvContenidoFichero;
+
+    private SharedPreferences preferencias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        preferencias = PreferenceManager.getDefaultSharedPreferences(this);
         mostrarContenido();
     }
 
@@ -46,7 +54,28 @@ public class MainActivity extends AppCompatActivity {
      */
     private String obtenerNombreFichero() {
 
-        return getResources().getString(R.string.default_NombreFich);
+        String nombreFichero = preferencias.getString(
+                getString(R.string.key_NombreFickero),
+                getString(R.string.default_NombreFich)
+        );
+        Log.i(LOG_TAG, "Nombre fichero: " + nombreFichero);
+
+        return nombreFichero;
+    }
+
+    /**
+     * Determina si prefiere memoria interna o externa
+     *
+     * @return valor lógico
+     */
+    private boolean utilizarMemInterna() {
+        boolean utilizarMemoria = !preferencias.getBoolean(
+                getString(R.string.key_TarjetaSD),
+                getResources().getBoolean(R.bool.default_prefTarjetaSD)
+        );
+        Log.i(LOG_TAG, "Memoria SD: " + ((utilizarMemoria) ? "on" : "off"));
+
+        return utilizarMemoria;
     }
 
     /**
@@ -56,11 +85,12 @@ public class MainActivity extends AppCompatActivity {
      * @param v Botón añadir
      */
     public void accionAniadir(View v) {
+        FileOutputStream fos;
 
         try {  // Añadir al fichero
-            FileOutputStream fos;
-
             fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss: ").format(new Date());
+            fos.write(date.getBytes());
             fos.write(etLineaTexto.getText().toString().getBytes());
             fos.write('\n');
             fos.close();
@@ -142,9 +172,12 @@ public class MainActivity extends AppCompatActivity {
                 BorrarDialogFragment dialogFragment = new BorrarDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
                 break;
-            case R.id.settings: // Ajustes
+            case R.id.settings: // Preferencias
+                Intent intent = new Intent(this, ActividadPreferencias.class);
+                startActivity(intent);
                 break;
         }
+
         return true;
     }
 }
