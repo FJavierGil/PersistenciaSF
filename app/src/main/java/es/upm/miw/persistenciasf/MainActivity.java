@@ -25,6 +25,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -215,20 +216,20 @@ public class MainActivity extends AppCompatActivity {
      */
     protected void borrarContenido() {
         try {  // Vaciar el fichero
-            FileOutputStream fos;
             if (utilizarMemInterna()) {
-                fos = openFileOutput(obtenerNombreFichero(), Context.MODE_PRIVATE); // Memoria interna
+                File f = new File(getFilesDir().getAbsolutePath(), obtenerNombreFichero());
+                if (!f.delete()) throw new FileNotFoundException();
             } else {    // Comprobar estado SD card
                 String estadoTarjetaSD = Environment.getExternalStorageState();
                 if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
                     String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
-                    fos = new FileOutputStream(rutaFich);
+                    File f = new File(rutaFich);
+                    if (!f.delete()) throw new FileNotFoundException();
                 } else {
                     Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
                     return;
                 }
             }
-            fos.close();
             Log.i(LOG_TAG, "opción Limpiar -> VACIAR el fichero");
             etLineaTexto.setText(""); // limpio la linea de edición
             mostrarContenido();
