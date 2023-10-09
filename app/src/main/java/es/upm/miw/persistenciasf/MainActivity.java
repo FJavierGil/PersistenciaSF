@@ -3,6 +3,8 @@ package es.upm.miw.persistenciasf;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -102,5 +104,47 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT
             ).show();
         }
+    }
+
+    /**
+     * Vaciar el contenido del fichero, la línea de edición y actualizar
+     */
+    protected void borrarContenido() {
+        try {  // Vaciar el fichero
+            FileOutputStream fos;
+            fos = openFileOutput(obtenerNombreFichero(), Context.MODE_PRIVATE); // Memoria interna
+            fos.close();
+            Log.i(LOG_TAG, "opción BORRAR -> VACIAR el fichero");
+            etLineaTexto.setText(""); // limpio línea de edición
+            mostrarContenido();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "FILE I/O ERROR: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Añade el menú con la opcion de vaciar el fichero
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflador del menú: añade elementos a la action bar
+        getMenuInflater().inflate(R.menu.menu_opciones, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.accionVaciar:
+                Log.i(LOG_TAG, "opción BORRAR");
+                BorrarDialogFragment dialogFragment = new BorrarDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
+                break;
+            case R.id.settings: // Ajustes
+                Log.i(LOG_TAG, "opción AJUSTES");
+                break;
+        }
+        return true;
     }
 }
