@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,6 +66,20 @@ public class MainActivity extends AppCompatActivity {
         etLineaTexto.setFilters(
                 new InputFilter[]{new InputFilter.LengthFilter(LONGITUD_MENSAJE)}
         );
+
+        // Provoca el envío al pulsar la tecla <Enter>
+        etLineaTexto.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Se ha pulsado una tecla y es <Enter>
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    btBotonEnviar.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
