@@ -1,6 +1,7 @@
 package es.upm.miw.persistenciasf;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -143,6 +144,8 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.settings: // Ajustes
                 Log.i(LOG_TAG, "opción AJUSTES");
+                Intent intent = new Intent(this, ActividadPreferencias.class);
+                startActivity(intent);
                 break;
         }
         return true;
