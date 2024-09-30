@@ -1,15 +1,15 @@
 plugins {
-    id 'com.android.application'
+    alias(libs.plugins.android.application)
 }
 
 android {
     namespace 'es.upm.miw.persistenciasf'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "es.upm.miw.persistenciasf"
         minSdk 23
-        targetSdk 32
+        targetSdk 35
         versionCode 1
         versionName "1.0"
     }
@@ -28,8 +28,12 @@ android {
 }
 
 dependencies {
-    implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintlayoutVersion"
-    implementation "androidx.preference:preference:$preferenceVersion"
+    implementation libs.core
+	implementation libs.appcompat
+	implementation libs.material
+    implementation libs.constraintLayout
+    implementation libs.preference
+    // implementation (libs.kotlin.stdlib.jdk8) {
+    //     exclude module: "kotlin-stdlib"
+    // }
 }
