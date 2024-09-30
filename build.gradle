@@ -1,16 +1,4 @@
-buildscript {
-    ext {
-        agp_version = '8.1.2'
-    }
-}
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-	id 'com.android.application' version "$agp_version" apply false
-}
-
-ext {
-    appcompatVersion = '1.6.1'
-    materialVersion = '1.10.0'
-    constraintlayoutVersion = '2.1.4'
-    preferenceVersion = '1.2.1'
+    alias(libs.plugins.android.application) apply false
 }

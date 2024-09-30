@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -45,6 +47,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Establece las inserciones de recortes de pantalla
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            androidx.core.graphics.Insets systemBars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         // Obtener vistas
         etLineaTexto       = findViewById(R.id.etTextoIntroducido);
         btBotonEnviar      = findViewById(R.id.btBotonEnviar);
@@ -57,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                btBotonEnviar.setEnabled(s.toString().trim().length() > 0);
+                btBotonEnviar.setEnabled(!s.toString().trim().isEmpty());
             }
 
             @Override
@@ -132,8 +143,7 @@ public class MainActivity extends AppCompatActivity {
             if (utilizarMemInterna()) {
                 fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
             } else {    // Comprobar estado SD card
-                String estadoTarjetaSD = Environment.getExternalStorageState();
-                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                if (isExternalStorageWritable()) {
                     String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
                     fos = new FileOutputStream(rutaFich, true);
                 } else {
@@ -175,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         new InputStreamReader(openFileInput(obtenerNombreFichero()))); // Memoria interna
             } else {
                 String estadoTarjetaSD = Environment.getExternalStorageState();
-                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) { /* SD card */
+                if (isExternalStorageReadable()) { /* SD card */
                     String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
                     Log.i(LOG_TAG, "rutaSD=" + rutaFich);
                     fin = new BufferedReader(new FileReader(new File(rutaFich)));
@@ -217,8 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 File f = new File(getFilesDir().getAbsolutePath(), obtenerNombreFichero());
                 if (!f.delete()) throw new FileNotFoundException();
             } else {    // Comprobar estado SD card
-                String estadoTarjetaSD = Environment.getExternalStorageState();
-                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                if (isExternalStorageWritable()) {
                     String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
                     File f = new File(rutaFich);
                     if (!f.delete()) throw new FileNotFoundException();
@@ -261,5 +270,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    // Checks if a volume containing external storage is available
+    // for read and write.
+    private boolean isExternalStorageWritable() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+
+    // Checks if a volume containing external storage is available to at least read.
+    private boolean isExternalStorageReadable() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ||
+                Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY);
     }
 }
