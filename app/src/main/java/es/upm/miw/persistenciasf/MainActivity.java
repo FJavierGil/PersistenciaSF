@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,13 +63,16 @@ public class MainActivity extends AppCompatActivity {
         btBotonEnviar      = findViewById(R.id.btBotonEnviar);
         tvContenidoFichero = findViewById(R.id.tvContenidoFichero);
 
+        preferencias = PreferenceManager.getDefaultSharedPreferences(this);
+
         activarBotonEnviar();
+
+        enviarPulsarEnter();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        preferencias = PreferenceManager.getDefaultSharedPreferences(this);
         mostrarContenido();
     }
 
@@ -265,5 +269,24 @@ public class MainActivity extends AppCompatActivity {
         etLineaTexto.setFilters(
                 new InputFilter[]{new InputFilter.LengthFilter(LONGITUD_MENSAJE)}
         );
+    }
+
+    /**
+     * Controla la tecla <Enter> -> Provoca el envío al pulsar la tecla <Enter>
+     */
+    private void enviarPulsarEnter() {
+        // Provoca el envío al pulsar la tecla <Enter>
+        etLineaTexto.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Se ha pulsado una tecla y es <Enter>
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    btBotonEnviar.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }
