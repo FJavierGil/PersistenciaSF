@@ -4,28 +4,44 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.preference.PreferenceManager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = "MiW";
+    private final int LONGITUD_MENSAJE = 140; // Máxima longitud mensajes
 
     private EditText etLineaTexto;
+    private Button btBotonEnviar;
     private TextView tvContenidoFichero;
+
+    private SharedPreferences preferencias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +59,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Obtener vistas
-        etLineaTexto = findViewById(R.id.etTextoIntroducido);
+        etLineaTexto       = findViewById(R.id.etTextoIntroducido);
+        btBotonEnviar      = findViewById(R.id.btBotonEnviar);
         tvContenidoFichero = findViewById(R.id.tvContenidoFichero);
+
+        preferencias = PreferenceManager.getDefaultSharedPreferences(this);
+
+        activarBotonEnviar();
+
+        enviarPulsarEnter();
     }
 
     @Override
@@ -59,7 +82,28 @@ public class MainActivity extends AppCompatActivity {
      * @return nombre del fichero
      */
     private String obtenerNombreFichero() {
-        return getResources().getString(R.string.default_NombreFich);
+        String nombreFichero = preferencias.getString(
+                getString(R.string.key_NombreFickero),
+                getString(R.string.default_NombreFich)
+        );
+        Log.i(LOG_TAG, "Nombre fichero: " + nombreFichero);
+
+        return nombreFichero;
+    }
+
+    /**
+     * Determina si prefiere memoria interna o externa
+     *
+     * @return valor lógico
+     */
+    private boolean utilizarMemInterna() {
+        boolean utilizarMemInterna = !preferencias.getBoolean(
+                getString(R.string.key_TarjetaSD),
+                getResources().getBoolean(R.bool.default_prefTarjetaSD)
+        );
+        Log.i(LOG_TAG, "Memoria SD: " + ((!utilizarMemInterna) ? "ON" : "OFF"));
+
+        return utilizarMemInterna;
     }
 
     /**
@@ -69,11 +113,27 @@ public class MainActivity extends AppCompatActivity {
      * @param v Botón Enviar (btBotonEnviar)
      */
     public void accionAniadir(View v) {
+        FileOutputStream fos;
 
         try {  // Añadir al fichero
-            FileOutputStream fos;
+            if (utilizarMemInterna()) {
+                fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
+            } else {    // Comprobar estado SD card
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    fos = new FileOutputStream(rutaFich, true);
+                } else {
+                    Toast.makeText(
+                            this,
+                            getString(R.string.txtErrorMemExterna),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+            }
 
-            fos = openFileOutput(obtenerNombreFichero(), Context.MODE_APPEND); // Memoria interna
+            // Escribir fichero
             fos.write(etLineaTexto.getText().toString().getBytes());
             fos.write('\n');
             fos.close();
@@ -97,8 +157,23 @@ public class MainActivity extends AppCompatActivity {
         tvContenidoFichero.setText("");
 
         try {   // Leer fichero y mostrarlo en TextView
-            fin = new BufferedReader(
-                    new InputStreamReader(openFileInput(obtenerNombreFichero()))); // Memoria interna
+            if (utilizarMemInterna()) {
+                fin = new BufferedReader(
+                        new InputStreamReader(openFileInput(obtenerNombreFichero()))); // Memoria interna
+            } else {
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) { /* SD card */
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    Log.i(LOG_TAG, "rutaSD=" + rutaFich);
+                    fin = new BufferedReader(new FileReader(new File(rutaFich)));
+                } else {
+                    Log.i(LOG_TAG, "Estado SDcard=" + estadoTarjetaSD);
+                    Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            // Procesar fichero
             String linea = fin.readLine();
             while (linea != null) {
                 hayContenido = true;
@@ -125,9 +200,20 @@ public class MainActivity extends AppCompatActivity {
      */
     protected void borrarContenido() {
         try {  // Vaciar el fichero
-            FileOutputStream fos;
-            fos = openFileOutput(obtenerNombreFichero(), Context.MODE_PRIVATE); // Memoria interna
-            fos.close();
+            if (utilizarMemInterna()) {
+                File f = new File(getFilesDir().getAbsolutePath(), obtenerNombreFichero());
+                if (!f.delete()) throw new FileNotFoundException();
+            } else {    // Comprobar estado SD card
+                String estadoTarjetaSD = Environment.getExternalStorageState();
+                if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) {
+                    String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
+                    File f = new File(rutaFich);
+                    if (!f.delete()) throw new FileNotFoundException();
+                } else {
+                    Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
             Log.i(LOG_TAG, "opción BORRAR -> VACIAR el fichero");
             etLineaTexto.setText(""); // limpio línea de edición
             mostrarContenido();
@@ -162,5 +248,45 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    /**
+     * Activa el botón enviar sólo cuando hay nuevo texto
+     */
+    private void activarBotonEnviar() {
+        etLineaTexto.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                btBotonEnviar.setEnabled(!s.toString().trim().isEmpty());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        etLineaTexto.setFilters(
+                new InputFilter[]{new InputFilter.LengthFilter(LONGITUD_MENSAJE)}
+        );
+    }
+
+    /**
+     * Controla la tecla <Enter> -> Provoca el envío al pulsar la tecla <Enter>
+     */
+    private void enviarPulsarEnter() {
+        // Provoca el envío al pulsar la tecla <Enter>
+        etLineaTexto.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Se ha pulsado una tecla y es <Enter>
+                if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    btBotonEnviar.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 }
