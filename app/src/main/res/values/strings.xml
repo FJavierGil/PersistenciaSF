@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">[MiW] Persistencia Ficheros</string>
+
+    <!-- Vistas y opciones -->
+    <string name="botónAñadir">Añadir</string>
+    <string name="hintTexto">Escriba aquí&#8239;</string>
+    <string name="txtFicheroVacio">El fichero está vacío</string>
+
+    <!-- Nombre (por defecto) del Fichero -->
+    <string name="default_NombreFich">fichero_MiW.txt</string>
+
+</resources>
