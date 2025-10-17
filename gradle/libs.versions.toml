@@ -6,13 +6,13 @@ materialVersion = '1.13.0'
 constraintLayoutVersion = '2.2.1'
 # recyclerviewVersion = '1.3.2'
 # kotlinStdlibJdk8Version = '2.0.21'
-# preferenceVersion = '1.2.1'
+preferenceVersion = '1.2.1'
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appCompatVersion" }
 core = { group = "androidx.core", name = "core", version.ref = "coreVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "materialVersion" }
-# preference = { group = "androidx.preference", name = "preference", version.ref = "preferenceVersion" }
+preference = { group = "androidx.preference", name = "preference", version.ref = "preferenceVersion" }
 constraintLayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayoutVersion" }
 # recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerviewVersion" }
 # kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlinStdlibJdk8Version" }

@@ -9,4 +9,30 @@
     <!-- Nombre (por defecto) del Fichero -->
     <string name="default_NombreFich">fichero_MiW.txt</string>
 
+    <!-- Opciones Menú Acciones -->
+    <string name="opcionAjustes">Ajustes</string>
+    <string name="opcionVaciar">Vaciar Fichero</string>
+
+    <!-- Diálogo Borrar -->
+    <string name="títuloDiálogo">Confirmación</string>
+    <string name="msgDiálogo">¿Desea borrar el fichero?</string>
+
+    <!-- Preferencias -->
+        <!-- Título categoría -->
+        <string name="key_Categoría">opc_Fichero</string>
+        <string name="title_Categoría">OPCIONES DE ALMACENAMIENTO</string>
+
+        <!-- Nombre del fichero -->
+        <string name="key_NombreFickero">pref_NombreFichero</string>
+        <string name="title_NombreFickero">Nombre del Fichero</string>
+
+        <!-- Tarjeta SD -->
+        <string name="key_TarjetaSD">utilizarTarjetaSD</string>
+        <bool   name="default_prefTarjetaSD">false</bool>
+        <string name="txtPrefTarjetaSD">Almacenamiento en tarjeta SD</string>
+        <string name="txtPrefTarjetaSDExplicación">
+                            Si se activa esta opción se almacenará la información
+                            en la tarjeta SD (si está disponible)
+        </string>
+
 </resources>
