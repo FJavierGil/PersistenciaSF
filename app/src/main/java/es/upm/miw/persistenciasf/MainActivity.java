@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        EdgeToEdge.enable(this);
         // Establece las inserciones de recortes de pantalla
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             androidx.core.graphics.Insets systemBars = insets.getInsets(
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 if (estadoTarjetaSD.equals(Environment.MEDIA_MOUNTED)) { /* SD card */
                     String rutaFich = getExternalFilesDir(null) + "/" + obtenerNombreFichero();
                     Log.i(LOG_TAG, "rutaSD=" + rutaFich);
-                    fin = new BufferedReader(new FileReader(new File(rutaFich)));
+                    fin = new BufferedReader(new FileReader(rutaFich));
                 } else {
                     Log.i(LOG_TAG, "Estado SDcard=" + estadoTarjetaSD);
                     Toast.makeText(this, getString(R.string.txtErrorMemExterna), Toast.LENGTH_SHORT).show();
@@ -235,18 +235,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.accionVaciar:
-                Log.i(LOG_TAG, "opción BORRAR");
-                BorrarDialogFragment dialogFragment = new BorrarDialogFragment();
-                dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
-                break;
-            case R.id.settings: // Ajustes
-                Log.i(LOG_TAG, "opción AJUSTES");
-                Intent intent = new Intent(this, ActividadPreferencias.class);
-                startActivity(intent);
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.accionVaciar) {
+            Log.i(LOG_TAG, "opción BORRAR");
+            BorrarDialogFragment dialogFragment = new BorrarDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
+        } else if (itemId == R.id.settings) {
+            Log.i(LOG_TAG, "opción AJUSTES");
+            Intent intent = new Intent(this, ActividadPreferencias.class);
+            startActivity(intent);
         }
+
         return true;
     }
 
