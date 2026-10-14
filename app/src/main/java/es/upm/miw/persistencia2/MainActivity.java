@@ -3,8 +3,9 @@ package es.upm.miw.persistencia2;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -17,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 
@@ -119,5 +122,46 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.LENGTH_SHORT
             ).show();
         }
+    }
+
+    /**
+     * Eliminar del fichero, vaciar la línea de edición y actualizar
+     */
+    protected void borrarContenido() {
+        try {  // Eliminar el fichero
+            File f = new File(getFilesDir().getAbsolutePath(), obtenerNombreFichero());
+            if (!f.delete()) throw new FileNotFoundException();
+
+            Log.i(LOG_TAG, "opción BORRAR -> VACIAR el fichero");
+            etLineaTexto.setText(""); // limpio línea de edición
+            mostrarContenido();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "FILE I/O ERROR: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Añade el menú con la opcion de vaciar el fichero<br>
+     * NOTA: Se modifica el padre del estilo base para mostrar la ActionBar
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflador del menú: añade elementos a la action bar
+        getMenuInflater().inflate(R.menu.menu_opciones, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.accionVaciar) {
+            Log.i(LOG_TAG, "opción BORRAR");
+            BorrarDialogFragment dialogFragment = new BorrarDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
+        } else if (itemId == R.id.settings) { // Ajustes
+            Log.i(LOG_TAG, "opción AJUSTES");
+        }
+
+        return true;
     }
 }

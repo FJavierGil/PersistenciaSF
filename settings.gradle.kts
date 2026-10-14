@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PersistenciaFicheros2"
+rootProject.name = "[MiW] Persistencia Ficheros"
 include(":app")
  

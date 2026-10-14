@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PersistenciaFicheros2</string>
+    <string name="app_name">[MiW] Persistencia Ficheros</string>
 
     <!-- Vistas y opciones -->
     <string name="botónAñadir">Añadir</string>
@@ -8,5 +8,13 @@
 
     <!-- Nombre (por defecto) del Fichero -->
     <string name="default_NombreFich">fichero_Datos_MiW.txt</string>
+
+    <!-- Opciones Menú Acciones -->
+    <string name="opcionAjustes">Ajustes</string>
+    <string name="opcionVaciar">Vaciar Fichero</string>
+
+    <!-- Diálogo Borrar -->
+    <string name="títuloDiálogo">Confirmación</string>
+    <string name="msgDiálogo">¿Desea borrar el fichero?</string>
 
 </resources>
