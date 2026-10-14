@@ -4,12 +4,14 @@ coreVersion = "1.19.1"
 appcompat = "1.8.0"
 material = "1.14.0"
 constraintlayout = "2.2.2"
+preference = "1.2.1"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 core = { group = "androidx.core", name = "core", version.ref = "coreVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

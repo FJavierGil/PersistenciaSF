@@ -1,6 +1,7 @@
 package es.upm.miw.persistencia2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -160,6 +161,8 @@ public class MainActivity extends AppCompatActivity {
             dialogFragment.show(getSupportFragmentManager(), "frgEliminar");
         } else if (itemId == R.id.settings) { // Ajustes
             Log.i(LOG_TAG, "opción AJUSTES");
+            Intent intent = new Intent(this, ActividadPreferencias.class);
+            startActivity(intent);
         }
 
         return true;
