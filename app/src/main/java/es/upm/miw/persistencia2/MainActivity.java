@@ -1,6 +1,7 @@
 package es.upm.miw.persistencia2;
 
 import static es.upm.miw.persistencia2.ControlBotones.configurarBotonValidacion;
+import static es.upm.miw.persistencia2.ControlBotones.enviarPulsarEnter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -61,8 +62,9 @@ public class MainActivity extends AppCompatActivity {
         // Obtener preferencias
         preferencias = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // Configurar botón Enviar (activar/desactivar)
+        // Configurar botón Enviar (activar/desactivar + evento Enter)
         configurarBotonValidacion(etLineaTexto, btBotonEnviar);
+        enviarPulsarEnter(etLineaTexto, btBotonEnviar);
     }
 
     @Override
