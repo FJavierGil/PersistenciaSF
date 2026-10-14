@@ -1,5 +1,7 @@
 package es.upm.miw.persistencia2;
 
+import static es.upm.miw.persistencia2.ControlBotones.configurarBotonValidacion;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = "MiW";
 
     private EditText etLineaTexto;
+    private Button btBotonEnviar;
     private TextView tvContenidoFichero;
 
     private SharedPreferences preferencias;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +55,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Obtener vistas
         etLineaTexto       = findViewById(R.id.etTextoIntroducido);
+        btBotonEnviar      = findViewById(R.id.btBotonEnviar);
         tvContenidoFichero = findViewById(R.id.tvContenidoFichero);
 
         // Obtener preferencias
         preferencias = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Configurar botón Enviar (activar/desactivar)
+        configurarBotonValidacion(etLineaTexto, btBotonEnviar);
     }
 
     @Override
